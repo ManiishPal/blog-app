@@ -2,6 +2,7 @@ import { ConnectDB } from "@/lib/config/db.js";
 import { NextResponse } from "next/server";
 import {writeFile} from 'fs/promises';
 import BlogModel from "@/lib/models/BlogModel.js";
+const fs = require('fs')
 
 
 const LoadDB = async () => {
@@ -53,4 +54,15 @@ export async function POST(request) {
 
     return NextResponse.json({success: true, msg: "Blog added"})
 
+}
+
+
+
+//API endpoint for deleting blogs
+export async function DELETE(request) {
+    const id = await request.nextUrl.searchParams.get('id');
+    const blog = await BlogModel.findById(id);
+    fs.unlink(`./public${blog.image}`, () => {})
+    await BlogModel.findByIdAndDelete(id);
+    return NextResponse.json({msg: "Blog deleted"})
 }
